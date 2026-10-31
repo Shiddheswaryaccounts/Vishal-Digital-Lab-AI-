@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Vishal Digital Lab AI</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Highlight.js for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- PDF.js for Reading Uploaded PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
+
+  <!-- html2pdf.js bundle -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- PptxGenJS for Text to Presentation (.pptx) -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Tailwind Custom Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#090d16',
+              surface: '#111827',
+              surfaceHover: '#1f293d',
+              border: '#1f2937',
+              cyan: '#06b6d4',
+              blue: '#2563eb',
+              violet: '#7c3aed',
+              accent: '#38bdf8'
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 25px -4px rgba(6, 182, 212, 0.35)',
+            'glow-violet': '0 0 25px -4px rgba(124, 58, 237, 0.35)',
+            'pill': '0 8px 30px rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+
+    /* Markdown Styling in AI messages */
+    .prose-chat p { margin-bottom: 0.65rem; }
+    .prose-chat p:last-child { margin-bottom: 0; }
+    .prose-chat pre {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 0.75rem;
+      padding: 0.85rem;
+      margin: 0.65rem 0;
+      position: relative;
+      overflow-x: auto;
+    }
+    .prose-chat code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+    }
+    .prose-chat :not(pre) > code {
+      background: rgba(30, 41, 59, 0.8);
+      color: #38bdf8;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.35rem;
+    }
+    .prose-chat ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.65rem; }
+    .prose-chat ol { list-style-type: decimal; margin-left: 1.25rem; margin-bottom: 0.65rem; }
+    .prose-chat table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.65rem 0;
+      font-size: 0.82rem;
+    }
+    .prose-chat th, .prose-chat td {
+      border: 1px solid #1e293b;
+      padding: 0.45rem 0.65rem;
+      text-align: left;
+    }
+    .prose-chat th { background: #111827; }
+    
+    .typing-cursor::after {
+      content: '▋';
+      display: inline-block;
+      color: #06b6d4;
+      animation: blink 0.9s infinite;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 flex flex-col h-full overflow-hidden select-none">
+
+  <!-- ============================================================== -->
+  <!-- 1. SPLASH / WELCOME SCREEN                                     -->
+  <!-- ============================================================== -->
+  <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-between p-8 bg-brand-dark transition-opacity duration-500">
+    <div class="w-72 h-72 rounded-full bg-gradient-to-tr from-brand-cyan/20 via-brand-blue/15 to-brand-violet/20 blur-3xl pointer-events-none mt-10"></div>
+    
+    <div class="flex flex-col items-center text-center -mt-20">
+      <!-- White card logo badge -->
+      <div class="relative w-32 h-32 mb-6 rounded-3xl bg-white shadow-2xl shadow-cyan-500/20 p-3 flex items-center justify-center border border-slate-200">
+        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vGradSplash" x1="20" y1="20" x2="160" y2="180" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00C9FF"/>
+              <stop offset="50%" stop-color="#0072FF"/>
+              <stop offset="100%" stop-color="#8A2387"/>
+            </linearGradient>
+          </defs>
+          <path d="M45 42 C 45 42, 60 48, 70 70 C 80 90, 96 138, 100 148 C 103 155, 110 157, 115 150 C 122 138, 142 85, 150 65" 
+                stroke="url(#vGradSplash)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M48 44 C 55 58, 86 134, 100 148 C 104 153, 110 151, 114 144 C 120 134, 134 94, 142 75" 
+                stroke="url(#vGradSplash)" stroke-width="16" stroke-linecap="round"/>
+          <g stroke="#0072FF" stroke-width="3" stroke-linecap="round" opacity="0.9">
+            <line x1="126" y1="84" x2="146" y2="58"/>
+            <line x1="146" y1="58" x2="172" y2="52"/>
+            <line x1="146" y1="58" x2="160" y2="82"/>
+            <line x1="126" y1="84" x2="160" y2="82"/>
+            <line x1="160" y1="82" x2="172" y2="72"/>
+            <line x1="172" y1="52" x2="172" y2="72"/>
+          </g>
+          <circle cx="126" cy="84" r="5.5" fill="#00C9FF"/>
+          <circle cx="146" cy="58" r="6.5" fill="#0072FF"/>
+          <circle cx="172" cy="52" r="7.5" fill="#7C3AED"/>
+          <circle cx="160" cy="82" r="7" fill="#2563EB"/>
+          <circle cx="172" cy="72" r="5" fill="#00C9FF"/>
+          <rect x="156" y="38" width="6.5" height="6.5" rx="1.5" fill="#0072FF"/>
+          <rect x="168" y="33" width="5.5" height="5.5" rx="1.5" fill="#00C9FF"/>
+          <rect x="178" y="62" width="5" height="5" rx="1" fill="#7C3AED"/>
+          <rect x="168" y="93" width="6" height="6" rx="1.5" fill="#0072FF"/>
+          <path d="M124 64 Q 124 74 114 74 Q 124 74 124 84 Q 124 74 134 74 Q 124 74 124 64 Z" fill="#00C9FF"/>
+        </svg>
+      </div>
+
+      <h1 class="text-3xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400">
+        VISHAL
+      </h1>
+      <h2 class="text-lg font-semibold tracking-widest text-slate-300 mt-0.5">
+        DIGITAL LAB <span class="bg-cyan-500/20 text-cyan-400 text-xs px-2 py-0.5 rounded-full border border-cyan-500/30 font-bold ml-1">AI</span>
+      </h2>
+      <p class="text-xs text-slate-400 mt-3 max-w-[240px] font-medium leading-relaxed">
+        Empowering Next-Gen Intelligence with File Understanding & Smart Exports
+      </p>
+    </div>
+
+    <div class="w-full max-w-xs flex flex-col gap-3 pb-safe mb-4">
+      <button id="startChatBtn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-violet text-white font-bold text-base shadow-lg shadow-cyan-500/25 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+        <span>Start Chatting</span>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </button>
+      <button id="splashApiKeyBtn" class="text-xs text-slate-500 hover:text-cyan-400 py-1 transition-colors flex items-center justify-center gap-1">
+        <span>⚙️ Configure Gemini API Key</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 2. SIDEBAR DRAWER (OVERLAY & MENU)                             -->
+  <!-- ============================================================== -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
+
+  <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 w-80 max-w-[85%] bg-brand-surface border-r border-brand-border z-40 flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out">
+    
+    <div class="p-4 border-b border-brand-border flex items-center justify-between pt-safe">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-white p-1 flex items-center justify-center shadow">
+          <svg viewBox="0 0 200 200" class="w-full h-full" fill="none">
+            <path d="M45 42 C 60 48, 70 70, 100 148 C 110 157, 122 138, 150 65" stroke="#0072FF" stroke-width="26" stroke-linecap="round"/>
+            <circle cx="172" cy="52" r="10" fill="#7C3AED"/>
+            <path d="M124 64 Q 124 74 114 74 Q 124 74 124 84 Q 124 74 134 74 Q 124 74 124 64 Z" fill="#00C9FF"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-slate-100">Vishal Digital Lab</h3>
+          <p class="text-[10px] text-cyan-400 font-medium">Assistant Workspace</p>
+        </div>
+      </div>
+      <button id="closeDrawerBtn" class="p-2 text-slate-400 hover:text-white rounded-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- New Chat Button -->
+    <div class="p-3">
+      <button id="newChatBtn" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-brand-blue to-brand-violet hover:opacity-90 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
+        <span class="text-lg leading-none">+</span>
+        <span>New Conversation</span>
+      </button>
+    </div>
+
+    <!-- AI Model Selector Pill Toggle -->
+    <div class="px-3 py-1">
+      <div class="bg-brand-dark/80 p-1 rounded-xl border border-brand-border flex items-center">
+        <button id="modelFlashBtn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-surface text-cyan-400 shadow transition-all">
+          ⚡ Fast Flash
+        </button>
+        <button id="modelProBtn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          🧠 Deep Thinker
+        </button>
+      </div>
+    </div>
+
+    <!-- Export to PDF Button in Drawer -->
+    <div class="px-3 pt-2">
+      <button id="exportPdfBtn" class="w-full py-2.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2 shadow transition-all active:scale-98">
+        <svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Export Chat as PDF</span>
+      </button>
+    </div>
+
+    <!-- Quick AI Creator Tools in Drawer -->
+    <div class="px-3 pt-2 space-y-1.5">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1 pt-1">AI Studio Tools</div>
+      <button id="drawerTextToPdfBtn" class="w-full py-2 px-3 rounded-xl bg-brand-surfaceHover hover:bg-slate-800 border border-brand-border text-xs text-slate-300 flex items-center gap-2 transition-all">
+        <span class="text-sm">📄</span>
+        <span>Text to PDF Maker</span>
+      </button>
+      <button id="drawerTextToPptBtn" class="w-full py-2 px-3 rounded-xl bg-brand-surfaceHover hover:bg-slate-800 border border-brand-border text-xs text-slate-300 flex items-center gap-2 transition-all">
+        <span class="text-sm">📊</span>
+        <span>Text to Presentation (PPT)</span>
+      </button>
+      <button id="drawerTextToAudioBtn" class="w-full py-2 px-3 rounded-xl bg-brand-surfaceHover hover:bg-slate-800 border border-brand-border text-xs text-slate-300 flex items-center gap-2 transition-all">
+        <span class="text-sm">🔊</span>
+        <span>Text to Audio Studio</span>
+      </button>
+
+      <!-- New File Library Vault Drawer Button -->
+      <button id="drawerLibraryBtn" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-950/60 to-violet-950/60 hover:from-blue-900/60 hover:to-violet-900/60 border border-blue-500/30 text-xs text-cyan-300 flex items-center justify-between transition-all">
+        <div class="flex items-center gap-2">
+          <span class="text-sm">📚</span>
+          <span class="font-semibold">My File Library</span>
+        </div>
+        <span id="libraryBadgeCount" class="px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono">0</span>
+      </button>
+    </div>
+
+    <!-- Session History List -->
+    <div class="flex-1 overflow-y-auto custom-scroll px-3 py-2 space-y-1" id="chatSessionsList"></div>
+
+    <!-- Drawer Footer -->
+    <div class="p-3 border-t border-brand-border bg-brand-dark/60 pb-safe">
+      <div class="flex items-center justify-between px-2 py-1.5 mb-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-[11px] text-emerald-300">
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Supabase Cloud Sync</span>
+        </span>
+        <span id="cloudSyncStatus" class="font-mono text-[10px] text-emerald-400">Online</span>
+      </div>
+      <button id="sidebarSettingsBtn" class="w-full flex items-center justify-between p-2 rounded-xl text-xs text-slate-400 hover:text-slate-200 hover:bg-brand-surface transition-colors mb-2">
+        <div class="flex items-center gap-2">
+          <span>⚙️</span>
+          <span>Gemini API Key</span>
+        </div>
+        <span id="apiKeyStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Configured</span>
+      </button>
+      <div class="text-center text-[11px] text-slate-500">
+        Powered by <span class="text-slate-300 font-semibold">Vishal Digital Lab</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================== -->
+  <!-- 3. MAIN APP HEADER                                             -->
+  <!-- ============================================================== -->
+  <header class="flex-none bg-brand-dark/95 backdrop-blur border-b border-brand-border px-3 py-2.5 flex items-center justify-between z-10 pt-safe">
+    
+    <div class="flex items-center gap-2">
+      <button id="openDrawerBtn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-brand-surface transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+        </svg>
+      </button>
+
+      <div class="w-8 h-8 rounded-xl bg-white p-1 flex items-center justify-center shadow-md border border-slate-200">
+        <svg viewBox="0 0 200 200" class="w-full h-full" fill="none">
+          <path d="M45 42 C 60 48, 70 70, 100 148 C 110 157, 122 138, 150 65" stroke="#0072FF" stroke-width="26" stroke-linecap="round"/>
+          <circle cx="172" cy="52" r="10" fill="#7C3AED"/>
+          <path d="M124 64 Q 124 74 114 74 Q 124 74 124 84 Q 124 74 134 74 Q 124 74 124 64 Z" fill="#00C9FF"/>
+        </svg>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-bold tracking-wide text-slate-100">VDL AI</span>
+          <span id="activeModelBadge" class="text-[9px] font-mono bg-cyan-950 text-cyan-400 px-1.5 py-0.2 rounded border border-cyan-800">Flash</span>
+        </div>
+        <span class="text-[9px] text-slate-400 truncate max-w-[140px]" id="currentChatTitleHeader">New Conversation</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5">
+      <!-- Quick File Library Vault Header Button -->
+      <button id="headerLibraryBtn" title="My Saved Files Library" class="p-2 rounded-xl text-slate-300 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors flex items-center justify-center relative">
+        <span class="text-base">📚</span>
+        <span id="headerLibraryDot" class="w-2 h-2 rounded-full bg-cyan-400 absolute top-1.5 right-1.5 hidden animate-pulse"></span>
+      </button>
+
+      <!-- One-Tap PDF Export Header Button -->
+      <button id="headerExportPdfBtn" title="Export PDF" class="p-2 rounded-xl text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center">
+        <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </button>
+      
+      <!-- Clear Chat -->
+      <button id="clearChatBtn" title="Clear current session" class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================== -->
+  <!-- 4. CHAT MESSAGE STREAM VIEWPORT                                -->
+  <!-- ============================================================== -->
+  <main id="chatViewport" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-4">
+    
+    <!-- Empty State Welcome Greeting -->
+    <div id="emptyGreeting" class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+      <div class="w-24 h-24 rounded-3xl bg-white p-2.5 flex items-center justify-center shadow-xl shadow-cyan-500/10 border border-slate-200 mb-4 animate-bounce">
+        <svg viewBox="0 0 200 200" class="w-full h-full" fill="none">
+          <path d="M45 42 C 45 42, 60 48, 70 70 C 80 90, 96 138, 100 148 C 103 155, 110 157, 115 150 C 122 138, 142 85, 150 65" 
+                stroke="url(#vGradSplash)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="172" cy="52" r="8" fill="#7C3AED"/>
+          <circle cx="146" cy="58" r="7" fill="#0072FF"/>
+          <rect x="156" y="38" width="6" height="6" rx="1.5" fill="#0072FF"/>
+          <path d="M124 64 Q 124 74 114 74 Q 124 74 124 84 Q 124 74 134 74 Q 124 74 124 64 Z" fill="#00C9FF"/>
+        </svg>
+      </div>
+
+      <h2 class="text-lg font-bold text-slate-100">Vishal Digital Lab AI</h2>
+      <p class="text-xs text-slate-400 mt-1 max-w-xs leading-relaxed">
+        Ask anything, attach PDF documents, share code snippets, or upload files for instant analysis.
+      </p>
+
+      <div class="grid grid-cols-2 gap-2 mt-6 w-full max-w-sm">
+        <button class="prompt-chip p-2.5 text-left rounded-xl bg-brand-surface border border-brand-border hover:border-brand-cyan/50 text-[11px] text-slate-300 transition-colors">
+          ✨ Explain Quantum Computing simply
+        </button>
+        <button class="prompt-chip p-2.5 text-left rounded-xl bg-brand-surface border border-brand-border hover:border-brand-cyan/50 text-[11px] text-slate-300 transition-colors">
+          📊 Create a 5-slide pitch presentation
+        </button>
+        <button class="prompt-chip p-2.5 text-left rounded-xl bg-brand-surface border border-brand-border hover:border-brand-cyan/50 text-[11px] text-slate-300 transition-colors">
+          🔊 Convert article into spoken speech
+        </button>
+        <button class="prompt-chip p-2.5 text-left rounded-xl bg-brand-surface border border-brand-border hover:border-brand-cyan/50 text-[11px] text-slate-300 transition-colors">
+          📄 Generate formatted business report PDF
+        </button>
+      </div>
+    </div>
+
+    <div id="messagesContainer" class="space-y-4"></div>
+  </main>
+
+  <!-- Attachment Preview Pill -->
+  <div id="filePreviewContainer" class="hidden px-4 py-2 bg-brand-dark/95 border-t border-brand-border">
+    <div class="relative inline-flex items-center gap-2.5 bg-brand-surface border border-brand-cyan/40 px-3 py-2 rounded-xl shadow-md">
+      <img id="imagePreview" src="" alt="attachment preview" class="w-10 h-10 object-cover rounded-lg border border-brand-cyan/50 hidden">
+      <div id="pdfIconPreview" class="w-10 h-10 rounded-lg bg-red-950/70 border border-red-500/50 flex flex-col items-center justify-center text-red-400 hidden">
+        <span class="text-sm font-bold leading-none">PDF</span>
+      </div>
+      <div id="fileIconPreview" class="w-10 h-10 rounded-lg bg-blue-950/70 border border-blue-500/50 flex flex-col items-center justify-center text-blue-400 hidden">
+        <span class="text-lg">📁</span>
+      </div>
+
+      <div class="flex flex-col pr-5">
+        <span id="attachedFileName" class="text-xs font-semibold text-slate-200 truncate max-w-[190px]">file</span>
+        <span id="attachedFileSize" class="text-[10px] text-brand-cyan font-mono">Ready to analyze</span>
+      </div>
+
+      <button id="removeFileBtn" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-red-700">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 5. FIXED BOTTOM INPUT PILL & CONTROLS                          -->
+  <!-- ============================================================== -->
+  <footer class="flex-none p-3 bg-brand-dark/90 backdrop-blur-lg border-t border-brand-border/70 pb-safe">
+    <div class="max-w-2xl mx-auto flex items-end gap-2 bg-brand-surface/90 border border-brand-border rounded-2xl p-1.5 shadow-xl transition-all focus-within:border-brand-cyan/60 focus-within:ring-1 focus-within:ring-brand-cyan/40">
+      
+      <!-- Attachment Button -->
+      <label class="cursor-pointer p-2.5 rounded-xl text-slate-400 hover:text-brand-cyan hover:bg-brand-surfaceHover transition-all flex items-center justify-center" title="Attach any File, PDF, or Image">
+        <input type="file" id="fileUpload" accept="*/*" class="hidden">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+        </svg>
+      </label>
+
+      <!-- Auto-expanding Textarea -->
+      <textarea id="chatInput" rows="1" placeholder="Type a message or discuss attached file..." class="flex-1 bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm focus:ring-0 focus:outline-none resize-none py-2 px-1 max-h-32 min-h-[38px]"></textarea>
+
+      <!-- Auto Prompt Rewrite & Enhance Button -->
+      <button id="enhancePromptBtn" class="p-2 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-amber-400/10 transition-all flex items-center justify-center" title="Auto Rewrite & Perfect Prompt">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+      </button>
+
+      <!-- Voice Input Dictation Button -->
+      <button id="voiceInputBtn" class="p-2.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-brand-surfaceHover transition-all flex items-center justify-center" title="Voice Input">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+        </svg>
+      </button>
+
+      <!-- Send or Stop Button -->
+      <button id="sendActionBtn" class="p-2.5 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-blue text-white shadow-md active:scale-95 transition-all flex items-center justify-center">
+        <svg id="sendIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+        </svg>
+        <svg id="stopIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+          <rect x="5" y="5" width="10" height="10" rx="1.5"/>
+        </svg>
+      </button>
+
+    </div>
+  </footer>
+
+  <!-- ============================================================== -->
+  <!-- 6. SETTINGS MODAL (API KEY & PREFERENCES)                      -->
+  <!-- ============================================================== -->
+  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-sm p-5 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+        <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+          <span>⚙️</span> Gemini API Settings
+        </h3>
+        <button id="closeSettingsModal" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="py-4 space-y-3">
+        <label class="block text-xs font-medium text-slate-300">
+          Google Gemini API Key
+        </label>
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-cyan">
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Your key is saved directly inside your phone's browser <code class="text-cyan-400">localStorage</code>. Free keys can be created at <a href="https://aistudio.google.com" target="_blank" class="text-cyan-400 underline">aistudio.google.com</a>.
+        </p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-brand-border">
+        <button id="saveApiKeyBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-blue text-white text-xs font-bold shadow hover:opacity-90 transition-opacity">
+          Save Configuration
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7. RELIABLE PDF EXPORT & DEVICE SAVE MODAL                     -->
+  <!-- ============================================================== -->
+  <div id="pdfDownloadModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-sm p-5 shadow-2xl flex flex-col gap-3.5">
+      
+      <div class="flex items-center justify-between pb-2 border-b border-brand-border">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-xs">
+            PDF
+          </div>
+          <h3 class="text-sm font-bold text-slate-100">Export Options</h3>
+        </div>
+        <button id="closePdfModalBtn" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Choose how you want to save your <strong class="text-cyan-400">Vishal Digital Lab AI</strong> chat transcript to your device:
+      </p>
+
+      <div class="flex flex-col gap-2 pt-1">
+        <!-- Option 1: Direct File Download -->
+        <a id="directPdfDownloadLink" href="#" download="VDL_AI_Chat.pdf" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-blue text-white text-xs font-bold shadow text-center flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span>📥 Download PDF File (.pdf)</span>
+        </a>
+
+        <!-- Option 2: View Document in New Tab (Guaranteed to work if download is blocked) -->
+        <button id="openPdfViewerBtn" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          <span>🌐 Open / View in New Tab</span>
+        </button>
+
+        <!-- Option 3: Native Android / iOS "Save as PDF" Print Dialog -->
+        <button id="printPdfBtn" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-medium border border-slate-800 flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          <span>🖨️ Phone Menu: "Save as PDF"</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7B. DEDICATED MOBILE FILE SAVER MODAL (FOR ALL GENERATED FILES)-->
+  <!-- ============================================================== -->
+  <div id="mobileFileSaveModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-sm p-5 shadow-2xl flex flex-col gap-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-brand-border">
+        <div class="flex items-center gap-2">
+          <div id="fileSaveModalIcon" class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-base">
+            📁
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-100">Save to Device</h3>
+            <p id="fileSaveModalSub" class="text-[10px] text-slate-400 font-mono truncate max-w-[200px]">document.pdf</p>
+          </div>
+        </div>
+        <button id="closeFileSaveModalBtn" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Choose your preferred mobile save method:
+      </p>
+
+      <div class="flex flex-col gap-2 pt-1">
+        <button id="mobileShareOrSaveBtn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-violet text-white text-xs font-bold shadow flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <span class="text-base">📱</span>
+          <span>Save to Phone Files / Share</span>
+        </button>
+
+        <button id="mobileOpenTabBtn" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <span class="text-base">🌐</span>
+          <span>Open File in Browser Tab</span>
+        </button>
+
+        <button id="mobileDirectDownloadBtn" class="w-full py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-medium border border-slate-800 flex items-center justify-center gap-2 active:scale-98 transition-all">
+          <span class="text-base">📥</span>
+          <span>Force Direct Download</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7C. AI CREATOR MODAL (TEXT TO PDF, PPT, AUDIO)                -->
+  <!-- ============================================================== -->
+  <div id="aiToolModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-md p-5 shadow-2xl flex flex-col gap-3">
+      <div class="flex items-center justify-between pb-2 border-b border-brand-border">
+        <h3 id="aiToolModalTitle" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+          <span>⚡</span> AI Generator
+        </h3>
+        <button id="closeAiToolModal" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label id="aiToolInputLabel" class="block text-xs font-medium text-slate-300 mb-1">Enter your text or topic:</label>
+          <textarea id="aiToolTextarea" rows="5" class="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-slate-100 focus:outline-none focus:border-brand-cyan resize-none" placeholder="Paste or type content here..."></textarea>
+        </div>
+
+        <!-- Audio Player Controls (visible in audio mode) -->
+        <div id="audioControlsBox" class="hidden p-3 rounded-xl bg-brand-dark border border-brand-border space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-300">
+            <span class="flex items-center gap-1.5 font-medium">
+              <span id="audioPlayingDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="audioStatusText">Ready to speak</span>
+            </span>
+            <span class="text-[10px] text-cyan-400 font-mono">VDL Voice Engine</span>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <button id="playAudioBtn" class="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+              <span>▶ Play Speech</span>
+            </button>
+            <button id="pauseAudioBtn" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+              ⏸ Pause
+            </button>
+            <button id="stopAudioBtn" class="py-2 px-3 rounded-lg bg-red-950/60 hover:bg-red-900 border border-red-800 text-red-300 text-xs font-semibold">
+              ⏹ Stop
+            </button>
+          </div>
+        </div>
+
+        <button id="aiToolActionBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-blue text-white text-xs font-bold shadow hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+          <span>🚀 Generate Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7C. GENERATED FILES LIBRARY VAULT MODAL                        -->
+  <!-- ============================================================== -->
+  <div id="libraryModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl w-full max-w-lg h-[82vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Library Modal Header -->
+      <div class="p-4 border-b border-brand-border flex items-center justify-between bg-brand-dark/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 p-1 flex items-center justify-center text-white shadow">
+            <span class="text-base">📚</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-100">Vishal Digital Lab Vault</h3>
+            <p class="text-[10px] text-slate-400">All Generated PDFs, Docs, Presentations & Audio</p>
+          </div>
+        </div>
+        <button id="closeLibraryModal" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+      </div>
+
+      <!-- Library Filter Tabs -->
+      <div class="flex items-center gap-1.5 p-3 border-b border-brand-border/70 overflow-x-auto custom-scroll text-xs">
+        <button onclick="filterLibraryFiles('all')" class="lib-tab active py-1.5 px-3 rounded-lg bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40 font-medium">All Files</button>
+        <button onclick="filterLibraryFiles('pdf')" class="lib-tab py-1.5 px-3 rounded-lg text-slate-400 hover:text-slate-200">📄 PDFs</button>
+        <button onclick="filterLibraryFiles('doc')" class="lib-tab py-1.5 px-3 rounded-lg text-slate-400 hover:text-slate-200">📝 Docs</button>
+        <button onclick="filterLibraryFiles('ppt')" class="lib-tab py-1.5 px-3 rounded-lg text-slate-400 hover:text-slate-200">📊 Slides</button>
+        <button onclick="filterLibraryFiles('audio')" class="lib-tab py-1.5 px-3 rounded-lg text-slate-400 hover:text-slate-200">🔊 Audio</button>
+      </div>
+
+      <!-- Files List Container -->
+      <div id="libraryFilesList" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-2.5">
+        <!-- Rendered items go here -->
+      </div>
+
+      <!-- Library Footer Info & Clear -->
+      <div class="p-3 border-t border-brand-border bg-brand-dark/60 flex items-center justify-between text-xs">
+        <span id="libraryStorageInfo" class="text-[11px] text-slate-400">0 files stored locally</span>
+        <div class="flex items-center gap-2">
+          <button id="downloadAllFilesBtn" onclick="downloadAllLibraryFiles()" class="text-[11px] px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-700/50 text-cyan-300 hover:bg-cyan-900 transition-colors">📦 Download All</button>
+          <button id="clearLibraryBtn" class="text-[11px] text-red-400 hover:text-red-300 hover:underline">Clear Library</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 8. APP LOGIC SCRIPT                                            -->
+  <!-- ============================================================== -->
+  <script>
+    // --- Supabase Cloud Configuration ---
+    const SUPABASE_URL = "https://tutrpfqblyccfddmwusr.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_24RMINnma3MDAztyfE9m7Q_1FGRxwtK";
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    let currentUserId = localStorage.getItem('vdl_user_id');
+    if (!currentUserId) {
+      currentUserId = 'user_' + Math.random().toString(36).substring(2, 12) + '_' + Date.now();
+      localStorage.setItem('vdl_user_id', currentUserId);
+    }
+
+    // --- State ---
+    const SYSTEM_INSTRUCTION = "You are Vishal Digital Lab AI, an intelligent, versatile, and high-performance assistant developed by Vishal Digital Lab. Your mission is to provide accurate, concise, and structured answers across academics, coding, problem solving, and general knowledge. Maintain an encouraging, professional, and sharp tone. If the user attaches a PDF or file document, analyze and quote relevant parts accurately.";
+
+    let sessions = [];
+    let activeSessionId = null;
+    let selectedModel = 'gemini-3-flash-preview';
+    let currentAttachedBase64 = null;
+    let currentAttachedFileText = null;
+    let currentAttachedFileName = null;
+    let isGenerating = false;
+    let abortController = null;
+    let speechRecognition = null;
+    let isListening = false;
+    let currentGeneratedPdfBlobUrl = null;
+    let currentGeneratedHtmlDoc = '';
+
+    // --- Library Vault Storage Array ---
+    let savedLibraryFiles = [];
+
+    // Helper: Convert DataURI or Base64 into real Blob
+    function dataUriToBlob(dataUri) {
+      if (!dataUri) return null;
+      if (dataUri instanceof Blob) return dataUri;
+      
+      if (!dataUri.startsWith('data:')) {
+        return new Blob([dataUri], { type: 'text/plain;charset=utf-8' });
+      }
+
+      const parts = dataUri.split(',');
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+      const byteString = atob(parts[1]);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([uint8Array], { type: mime });
+    }
+
+    // Active pending file for mobile modal download
+    let pendingMobileFile = {
+      blob: null,
+      name: '',
+      mime: '',
+      dataUri: ''
+    };
+
+    function showMobileSaveModal(blob, fileName, mimeType, dataUri = '') {
+      pendingMobileFile = { blob, name: fileName, mime: mimeType, dataUri };
+      
+      const modal = document.getElementById('mobileFileSaveModal');
+      const nameEl = document.getElementById('fileSaveModalSub');
+      const iconEl = document.getElementById('fileSaveModalIcon');
+
+      if (nameEl) nameEl.textContent = fileName;
+      if (iconEl) {
+        if (fileName.endsWith('.pdf')) iconEl.textContent = '📄';
+        else if (fileName.endsWith('.doc')) iconEl.textContent = '📝';
+        else if (fileName.endsWith('.pptx')) iconEl.textContent = '📊';
+        else iconEl.textContent = '📁';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    document.getElementById('closeFileSaveModalBtn').addEventListener('click', () => {
+      document.getElementById('mobileFileSaveModal').classList.add('hidden');
+    });
+
+    document.getElementById('mobileShareOrSaveBtn').addEventListener('click', async () => {
+      if (!pendingMobileFile.blob) return;
+      try {
+        const fileObj = new File([pendingMobileFile.blob], pendingMobileFile.name, {
+          type: pendingMobileFile.blob.type || pendingMobileFile.mime || 'application/octet-stream'
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
+          await navigator.share({
+            files: [fileObj],
+            title: pendingMobileFile.name,
+            text: `Document from Vishal Digital Lab AI: ${pendingMobileFile.name}`
+          });
+          showToast('Saved to device!', '📱');
+          document.getElementById('mobileFileSaveModal').classList.add('hidden');
+          return;
+        }
+      } catch (err) {
+        // Fallback to direct anchor download
+      }
+
+      forceAnchorDownload(pendingMobileFile.blob, pendingMobileFile.name);
+    });
+
+    document.getElementById('mobileOpenTabBtn').addEventListener('click', () => {
+      if (!pendingMobileFile.blob) return;
+      const url = URL.createObjectURL(pendingMobileFile.blob);
+      window.open(url, '_blank');
+      showToast('Opened in new tab. Tap browser menu to save!', '🌐');
+    });
+
+    document.getElementById('mobileDirectDownloadBtn').addEventListener('click', () => {
+      if (!pendingMobileFile.blob) return;
+      forceAnchorDownload(pendingMobileFile.blob, pendingMobileFile.name);
+    });
+
+    function forceAnchorDownload(blob, fileName) {
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = fileName;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+      }, 1500);
+      showToast(`Downloading: ${fileName}`, '📥');
+    }
+
+    // Universal Device Downloader (Mobile & Desktop Safe)
+    async function triggerRealDeviceDownload(blobOrDataUri, fileName, mimeType = 'application/octet-stream') {
+      try {
+        let blob;
+        if (blobOrDataUri instanceof Blob) {
+          blob = blobOrDataUri;
+        } else if (typeof blobOrDataUri === 'string') {
+          if (blobOrDataUri.startsWith('data:')) {
+            blob = dataUriToBlob(blobOrDataUri);
+          } else {
+            blob = new Blob([blobOrDataUri], { type: mimeType });
+          }
+        }
+
+        if (!blob) throw new Error('Unable to construct download file');
+
+        // Always show the dedicated mobile save modal so the phone's browser or webview cannot block it
+        showMobileSaveModal(blob, fileName, mimeType, typeof blobOrDataUri === 'string' ? blobOrDataUri : '');
+      } catch (err) {
+        console.error('Download error:', err);
+        showToast('Error preparing file for download', '⚠️');
+      }
+    }
+
+    // --- DOM Elements ---
+    const splashScreen = document.getElementById('splashScreen');
+    const startChatBtn = document.getElementById('startChatBtn');
+    const splashApiKeyBtn = document.getElementById('splashApiKeyBtn');
+
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const sidebarDrawer = document.getElementById('sidebarDrawer');
+    const openDrawerBtn = document.getElementById('openDrawerBtn');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+    const newChatBtn = document.getElementById('newChatBtn');
+    const chatSessionsList = document.getElementById('chatSessionsList');
+    const modelFlashBtn = document.getElementById('modelFlashBtn');
+    const modelProBtn = document.getElementById('modelProBtn');
+    const activeModelBadge = document.getElementById('activeModelBadge');
+    const currentChatTitleHeader = document.getElementById('currentChatTitleHeader');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const headerExportPdfBtn = document.getElementById('headerExportPdfBtn');
+
+    const chatViewport = document.getElementById('chatViewport');
+    const emptyGreeting = document.getElementById('emptyGreeting');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const chatInput = document.getElementById('chatInput');
+    const sendActionBtn = document.getElementById('sendActionBtn');
+    const sendIcon = document.getElementById('sendIcon');
+    const stopIcon = document.getElementById('stopIcon');
+
+    const fileUpload = document.getElementById('fileUpload');
+    const filePreviewContainer = document.getElementById('filePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const pdfIconPreview = document.getElementById('pdfIconPreview');
+    const fileIconPreview = document.getElementById('fileIconPreview');
+    const attachedFileName = document.getElementById('attachedFileName');
+    const attachedFileSize = document.getElementById('attachedFileSize');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+    const enhancePromptBtn = document.getElementById('enhancePromptBtn');
+
+    const settingsModal = document.getElementById('settingsModal');
+    const sidebarSettingsBtn = document.getElementById('sidebarSettingsBtn');
+    const closeSettingsModal = document.getElementById('closeSettingsModal');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+    const apiKeyStatusBadge = document.getElementById('apiKeyStatusBadge');
+
+    const pdfDownloadModal = document.getElementById('pdfDownloadModal');
+    const directPdfDownloadLink = document.getElementById('directPdfDownloadLink');
+    const openPdfViewerBtn = document.getElementById('openPdfViewerBtn');
+    const printPdfBtn = document.getElementById('printPdfBtn');
+    const closePdfModalBtn = document.getElementById('closePdfModalBtn');
+
+    // --- Markdown Configuration ---
+    marked.setOptions({
+      breaks: true,
+      highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+      }
+    });
+
+    // --- Init App ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadApiKey();
+      await loadSessionsFromStorage();
+      setupSpeechRecognition();
+      setupPromptChips();
+
+      if (sessionStorage.getItem('vdl_splash_dismissed') === 'true') {
+        splashScreen.classList.add('hidden');
+      }
+    });
+
+    startChatBtn.addEventListener('click', () => {
+      splashScreen.classList.add('opacity-0');
+      sessionStorage.setItem('vdl_splash_dismissed', 'true');
+      setTimeout(() => splashScreen.classList.add('hidden'), 500);
+    });
+
+    // --- Sessions & Supabase Sync ---
+    async function loadSessionsFromStorage() {
+      const stored = localStorage.getItem('vdl_ai_sessions');
+      if (stored) {
+        try {
+          sessions = JSON.parse(stored);
+        } catch (e) {
+          sessions = [];
+        }
+      }
+
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('vdl_chat_sessions')
+            .select('*')
+            .eq('user_id', currentUserId);
+
+          if (!error && data && data.length > 0) {
+            const cloudSessions = data.map(item => ({
+              id: item.session_id,
+              title: item.title,
+              pinned: Boolean(item.pinned),
+              createdAt: new Date(item.created_at).getTime(),
+              messages: Array.isArray(item.messages) ? item.messages : JSON.parse(item.messages || '[]')
+            }));
+
+            const sessionMap = new Map();
+            [...sessions, ...cloudSessions].forEach(s => sessionMap.set(s.id, s));
+            sessions = Array.from(sessionMap.values());
+            sessions.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+            localStorage.setItem('vdl_ai_sessions', JSON.stringify(sessions));
+            updateCloudStatus('Synced');
+          }
+        } catch (syncErr) {
+          updateCloudStatus('Local Mode');
+        }
+      }
+
+      if (!sessions || sessions.length === 0) {
+        createNewSession();
+      } else {
+        activeSessionId = sessions[0].id;
+        renderSessionsDrawer();
+        renderActiveConversation();
+      }
+    }
+
+    async function syncSessionToSupabase(session) {
+      if (!supabaseClient || !session) return;
+      try {
+        const payload = {
+          user_id: currentUserId,
+          session_id: session.id,
+          title: session.title,
+          pinned: session.pinned,
+          messages: session.messages,
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await supabaseClient
+          .from('vdl_chat_sessions')
+          .upsert(payload, { onConflict: 'session_id' });
+
+        if (!error) {
+          updateCloudStatus('Synced');
+        }
+      } catch (err) {
+        // Fallback local
+      }
+    }
+
+    function updateCloudStatus(statusText) {
+      const statusEl = document.getElementById('cloudSyncStatus');
+      if (statusEl) statusEl.textContent = statusText;
+    }
+
+    function saveSessionsToStorage() {
+      localStorage.setItem('vdl_ai_sessions', JSON.stringify(sessions));
+      renderSessionsDrawer();
+
+      const active = getActiveSession();
+      if (active) {
+        syncSessionToSupabase(active);
+      }
+    }
+
+    function createNewSession() {
+      const newSession = {
+        id: 'session_' + Date.now(),
+        title: 'New Conversation',
+        pinned: false,
+        createdAt: Date.now(),
+        messages: []
+      };
+      sessions.unshift(newSession);
+      activeSessionId = newSession.id;
+      saveSessionsToStorage();
+      renderActiveConversation();
+      closeSidebar();
+    }
+
+    newChatBtn.addEventListener('click', createNewSession);
+
+    function getActiveSession() {
+      return sessions.find(s => s.id === activeSessionId) || sessions[0];
+    }
+
+    function renderSessionsDrawer() {
+      chatSessionsList.innerHTML = '';
+      sessions.forEach(session => {
+        const item = document.createElement('div');
+        const isActive = session.id === activeSessionId;
+        item.className = `group flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all ${
+          isActive ? 'bg-brand-surfaceHover text-cyan-400 border border-brand-cyan/30' : 'text-slate-400 hover:bg-brand-dark/40 hover:text-slate-200'
+        }`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2 truncate flex-1 mr-2" onclick="switchSession('${session.id}')">
+            <span>${session.pinned ? '📌' : '💬'}</span>
+            <span class="truncate font-medium">${escapeHtml(session.title)}</span>
+          </div>
+          <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100">
+            <button onclick="togglePinSession('${session.id}', event)" class="p-1 hover:text-cyan-400 text-slate-500" title="Pin">
+              ${session.pinned ? '★' : '☆'}
+            </button>
+            <button onclick="deleteSession('${session.id}', event)" class="p-1 hover:text-red-400 text-slate-500" title="Delete">
+              ✕
+            </button>
+          </div>
+        `;
+        chatSessionsList.appendChild(item);
+      });
+    }
+
+    window.switchSession = function(id) {
+      activeSessionId = id;
+      renderSessionsDrawer();
+      renderActiveConversation();
+      closeSidebar();
+    };
+
+    window.togglePinSession = function(id, e) {
+      e.stopPropagation();
+      const s = sessions.find(x => x.id === id);
+      if (s) {
+        s.pinned = !s.pinned;
+        sessions.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+        saveSessionsToStorage();
+        renderActiveConversation();
+      }
+    };
+
+    window.deleteSession = async function(id, e) {
+      e.stopPropagation();
+      if (sessions.length <= 1) {
+        clearCurrentChat();
+        return;
+      }
+
+      if (supabaseClient) {
+        supabaseClient.from('vdl_chat_sessions').delete().eq('session_id', id).catch(() => {});
+      }
+
+      sessions = sessions.filter(x => x.id !== id);
+      if (activeSessionId === id) {
+        activeSessionId = sessions[0].id;
+      }
+      saveSessionsToStorage();
+      renderActiveConversation();
+    };
+
+    // --- Sidebar Controls ---
+    function openSidebar() {
+      drawerOverlay.classList.remove('hidden');
+      setTimeout(() => {
+        drawerOverlay.classList.remove('opacity-0');
+        sidebarDrawer.classList.remove('-translate-x-full');
+      }, 10);
+    }
+
+    function closeSidebar() {
+      drawerOverlay.classList.add('opacity-0');
+      sidebarDrawer.classList.add('-translate-x-full');
+      setTimeout(() => drawerOverlay.classList.add('hidden'), 300);
+    }
+
+    openDrawerBtn.addEventListener('click', openSidebar);
+    closeDrawerBtn.addEventListener('click', closeSidebar);
+    drawerOverlay.addEventListener('click', closeSidebar);
+
+    // --- Model Switching ---
+    modelFlashBtn.addEventListener('click', () => {
+      selectedModel = 'gemini-3-flash-preview';
+      modelFlashBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-surface text-cyan-400 shadow transition-all';
+      modelProBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+      activeModelBadge.textContent = 'Flash';
+      activeModelBadge.className = 'text-[9px] font-mono bg-cyan-950 text-cyan-400 px-1.5 py-0.2 rounded border border-cyan-800';
+      showToast('Switched to Fast Flash', '⚡');
+    });
+
+    modelProBtn.addEventListener('click', () => {
+      selectedModel = 'gemini-3-flash-preview';
+      modelProBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-surface text-violet-400 shadow transition-all';
+      modelFlashBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+      activeModelBadge.textContent = 'Thinker';
+      activeModelBadge.className = 'text-[9px] font-mono bg-violet-950 text-violet-400 px-1.5 py-0.2 rounded border border-violet-800';
+      showToast('Switched to Deep Thinker', '🧠');
+    });
+
+    // --- API Key Modal Logic ---
+    function loadApiKey() {
+      const storedKey = localStorage.getItem('GEMINI_API_KEY') || '';
+      apiKeyInput.value = storedKey;
+      if (storedKey) {
+        apiKeyStatusBadge.textContent = 'Configured';
+        apiKeyStatusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      } else {
+        apiKeyStatusBadge.textContent = 'Runtime Ready';
+        apiKeyStatusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20';
+      }
+    }
+
+    splashApiKeyBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    sidebarSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    closeSettingsModal.addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+    saveApiKeyBtn.addEventListener('click', () => {
+      const keyVal = apiKeyInput.value.trim();
+      if (keyVal) {
+        localStorage.setItem('GEMINI_API_KEY', keyVal);
+        showToast('API Key saved successfully!', '✅');
+      } else {
+        localStorage.removeItem('GEMINI_API_KEY');
+        showToast('Using automated runtime key', 'ℹ️');
+      }
+      loadApiKey();
+      settingsModal.classList.add('hidden');
+    });
+
+    // --- Clear Chat ---
+    clearChatBtn.addEventListener('click', clearCurrentChat);
+
+    function clearCurrentChat() {
+      const session = getActiveSession();
+      session.messages = [];
+      session.title = 'New Conversation';
+      saveSessionsToStorage();
+      renderActiveConversation();
+      showToast('Chat history cleared', '🗑️');
+    }
+
+    // --- Rendering Active Messages ---
+    function renderActiveConversation() {
+      const session = getActiveSession();
+      currentChatTitleHeader.textContent = session.title;
+      messagesContainer.innerHTML = '';
+
+      if (!session.messages || session.messages.length === 0) {
+        emptyGreeting.classList.remove('hidden');
+      } else {
+        emptyGreeting.classList.add('hidden');
+        session.messages.forEach((msg, idx) => {
+          appendMessageBubble(msg.role, msg.content, msg.image, false, idx, msg.fileName);
+        });
+        scrollToBottom();
+      }
+    }
+
+    function appendMessageBubble(role, content, imageBase64 = null, isStream = false, msgIndex = null, fileName = null) {
+      emptyGreeting.classList.add('hidden');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex flex-col w-full ${role === 'user' ? 'items-end' : 'items-start'} transition-opacity duration-300`;
+
+      if (role === 'user') {
+        const isPdf = fileName && fileName.toLowerCase().endsWith('.pdf');
+        wrapper.innerHTML = `
+          <div class="max-w-[85%] rounded-2xl rounded-br-xs px-4 py-3 bg-gradient-to-r from-brand-blue to-blue-700 text-white shadow-md text-sm">
+            ${imageBase64 ? `<img src="${imageBase64}" class="w-full max-h-48 object-cover rounded-xl mb-2 border border-white/20"/>` : ''}
+            ${fileName ? `
+              <div class="flex items-center gap-2 mb-2 p-2 rounded-xl bg-black/25 border border-white/20">
+                <span class="text-base">${isPdf ? '📄' : '📁'}</span>
+                <span class="text-xs font-mono font-medium truncate max-w-[200px]">${escapeHtml(fileName)}</span>
+              </div>
+            ` : ''}
+            <div class="whitespace-pre-wrap break-words">${escapeHtml(content)}</div>
+          </div>
+          <span class="text-[10px] text-slate-500 mt-1 mr-1">You</span>
+        `;
+      } else {
+        const bubbleId = isStream ? 'streamingBubble' : `msg_${msgIndex || Date.now()}`;
+        wrapper.innerHTML = `
+          <div class="flex items-start gap-2 max-w-[90%]">
+            <div class="w-7 h-7 rounded-xl bg-white p-0.5 flex-none flex items-center justify-center shadow-md border border-slate-200 mt-0.5">
+              <svg viewBox="0 0 200 200" class="w-full h-full" fill="none">
+                <path d="M45 42 C 60 48, 70 70, 100 148 C 110 157, 122 138, 150 65" stroke="#0072FF" stroke-width="26" stroke-linecap="round"/>
+                <circle cx="172" cy="52" r="10" fill="#7C3AED"/>
+                <path d="M124 64 Q 124 74 114 74 Q 124 74 124 84 Q 124 74 134 74 Q 124 74 124 64 Z" fill="#00C9FF"/>
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <div id="${bubbleId}" class="rounded-2xl rounded-bl-xs px-4 py-3 bg-brand-surface border border-brand-border/80 shadow text-slate-200 text-sm prose-chat leading-relaxed ${isStream ? 'typing-cursor' : ''}">
+                ${isStream ? '' : renderMarkdown(content)}
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-2 ml-1">
+                <span class="text-[10px] text-cyan-400 font-semibold mr-1">VDL AI</span>
+                ${!isStream ? `
+                  <button onclick="copyBubbleText(this)" data-content="${encodeURIComponent(content)}" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors" title="Copy Message">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span>Copy</span>
+                  </button>
+                  <button onclick="exportSingleMessagePdf('${bubbleId}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-800/40 transition-colors" title="Export as PDF">
+                    <svg class="w-3.5 h-3.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>PDF</span>
+                  </button>
+                  <button onclick="exportSingleMessageDoc('${bubbleId}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-blue-950/40 hover:bg-blue-900/50 text-blue-300 border border-blue-800/40 transition-colors" title="Export as Word / Docs">
+                    <svg class="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>DOCS</span>
+                  </button>
+                  <button onclick="exportMessageToPpt('${bubbleId}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 border border-amber-800/40 transition-colors" title="Convert to Presentation Slides">
+                    <span>📊 PPT</span>
+                  </button>
+                  <button onclick="speakMessageBubble('${bubbleId}')" class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-purple-950/40 hover:bg-purple-900/50 text-purple-300 border border-purple-800/40 transition-colors" title="Read Aloud (Text to Audio)">
+                    <span>🔊 Audio</span>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      messagesContainer.appendChild(wrapper);
+      scrollToBottom();
+      return wrapper;
+    }
+
+    function renderMarkdown(text) {
+      if (!text) return '';
+      const rawHtml = marked.parse(text);
+      const div = document.createElement('div');
+      div.innerHTML = rawHtml;
+      div.querySelectorAll('pre').forEach(pre => {
+        const btn = document.createElement('button');
+        btn.textContent = 'Copy Code';
+        btn.className = 'absolute top-2 right-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 select-none';
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const codeEl = pre.querySelector('code');
+          if (codeEl) {
+            navigator.clipboard.writeText(codeEl.innerText);
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy Code', 2000);
+          }
+        };
+        pre.style.position = 'relative';
+        pre.appendChild(btn);
+      });
+      return div.innerHTML;
+    }
+
+    window.copyBubbleText = function(btn) {
+      const text = decodeURIComponent(btn.getAttribute('data-content'));
+      document.execCommand('copy');
+      navigator.clipboard.writeText(text).catch(() => {});
+      btn.innerHTML = `<span class="text-emerald-400">✓ Copied</span>`;
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <span>Copy</span>
+        `;
+      }, 2000);
+    };
+
+    // --- Export Single AI Response as PDF ---
+    window.exportSingleMessagePdf = async function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      showToast('Preparing PDF for this answer...', '⏳');
+
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; color: #0f172a; background: #ffffff;">
+          <div style="border-bottom: 2px solid #0072FF; padding-bottom: 12px; margin-bottom: 16px;">
+            <h2 style="color: #0072FF; margin: 0; font-size: 18px; font-weight: 800;">VISHAL DIGITAL LAB AI</h2>
+            <p style="font-size: 11px; color: #64748b; margin: 4px 0 0;">Response Report • ${new Date().toLocaleString()}</p>
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: #1e293b;">
+            ${el.innerHTML}
+          </div>
+          <div style="margin-top: 24px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center;">
+            Generated via Vishal Digital Lab AI
+          </div>
+        </div>
+      `;
+
+      try {
+        if (typeof html2pdf === 'function') {
+          const opt = {
+            margin: [10, 10, 10, 10],
+            filename: `VDL_AI_Answer_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          const pdfWorker = html2pdf().from(wrapper).set(opt);
+          const pdfBlob = await pdfWorker.output('blob');
+          const blobUrl = URL.createObjectURL(pdfBlob);
+
+          const dl = document.createElement('a');
+          dl.href = blobUrl;
+          dl.download = `VDL_AI_Answer_${Date.now()}.pdf`;
+          document.body.appendChild(dl);
+          dl.click();
+          dl.remove();
+          showToast('Answer downloaded as PDF!', '📄');
+        } else {
+          showToast('PDF generator loading...', '⚠️');
+        }
+      } catch (err) {
+        showToast('Download blocked. Tap top PDF button for print fallback', '⚠️');
+      }
+    };
+
+    // --- Export Single AI Response as Word Document (.doc) ---
+    window.exportSingleMessageDoc = function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      showToast('Generating Word Document...', '⏳');
+
+      const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Vishal Digital Lab AI Answer</title>
+        <style>
+          body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #111827; }
+          h1 { color: #0072FF; font-size: 16pt; margin-bottom: 2pt; }
+          .meta { color: #6B7280; font-size: 9pt; margin-bottom: 16pt; }
+          pre, code { font-family: Consolas, monospace; background: #F3F4F6; padding: 4pt; }
+        </style>
+        </head><body>
+        <h1>VISHAL DIGITAL LAB AI</h1>
+        <div class="meta">Exported on: ${new Date().toLocaleString()} | Powered by Vishal Digital Lab</div>
+        <hr style="border: 0; border-top: 1px solid #D1D5DB; margin-bottom: 14pt;"/>
+      `;
+      const footer = `</body></html>`;
+      const htmlContent = header + el.innerHTML + footer;
+
+      const blob = new Blob(['\ufeff', htmlContent], {
+        type: 'application/msword'
+      });
+      const url = URL.createObjectURL(blob);
+      const dl = document.createElement('a');
+      dl.href = url;
+      dl.download = `VDL_AI_Answer_${Date.now()}.doc`;
+      document.body.appendChild(dl);
+      dl.click();
+      dl.remove();
+      showToast('Downloaded as .doc (Word) file!', '📝');
+    };
+
+    // ==============================================================
+    // 8B. TEXT TO PRESENTATION, TEXT TO AUDIO, TEXT TO PDF MODAL
+    // ==============================================================
+    let activeToolMode = 'pdf'; // 'pdf' | 'ppt' | 'audio'
+    let currentSpeechSynthesisUtterance = null;
+
+    const aiToolModal = document.getElementById('aiToolModal');
+    const aiToolModalTitle = document.getElementById('aiToolModalTitle');
+    const aiToolInputLabel = document.getElementById('aiToolInputLabel');
+    const aiToolTextarea = document.getElementById('aiToolTextarea');
+    const aiToolActionBtn = document.getElementById('aiToolActionBtn');
+    const closeAiToolModal = document.getElementById('closeAiToolModal');
+    const audioControlsBox = document.getElementById('audioControlsBox');
+    const audioStatusText = document.getElementById('audioStatusText');
+    const audioPlayingDot = document.getElementById('audioPlayingDot');
+    const playAudioBtn = document.getElementById('playAudioBtn');
+    const pauseAudioBtn = document.getElementById('pauseAudioBtn');
+    const stopAudioBtn = document.getElementById('stopAudioBtn');
+
+    const drawerTextToPdfBtn = document.getElementById('drawerTextToPdfBtn');
+    const drawerTextToPptBtn = document.getElementById('drawerTextToPptBtn');
+    const drawerTextToAudioBtn = document.getElementById('drawerTextToAudioBtn');
+
+    // Library Elements
+    const libraryModal = document.getElementById('libraryModal');
+    const headerLibraryBtn = document.getElementById('headerLibraryBtn');
+    const drawerLibraryBtn = document.getElementById('drawerLibraryBtn');
+    const closeLibraryModal = document.getElementById('closeLibraryModal');
+    const libraryBadgeCount = document.getElementById('libraryBadgeCount');
+    const headerLibraryDot = document.getElementById('headerLibraryDot');
+    const libraryFilesList = document.getElementById('libraryFilesList');
+    const libraryStorageInfo = document.getElementById('libraryStorageInfo');
+    const clearLibraryBtn = document.getElementById('clearLibraryBtn');
+
+    // --- Markdown Configuration ---
+    // --- Init App ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadApiKey();
+      loadLibraryFiles();
+      await loadSessionsFromStorage();
+      setupSpeechRecognition();
+      setupPromptChips();
+
+      if (sessionStorage.getItem('vdl_splash_dismissed') === 'true') {
+        splashScreen.classList.add('hidden');
+      }
+    });
+
+    // ==============================================================
+    // 8C. FILE VAULT & LIBRARY LOGIC (PDF, DOCS, PPT, AUDIO)
+    // ==============================================================
+    function loadLibraryFiles() {
+      const stored = localStorage.getItem('vdl_ai_library_files');
+      if (stored) {
+        try {
+          savedLibraryFiles = JSON.parse(stored);
+        } catch (e) {
+          savedLibraryFiles = [];
+        }
+      }
+      updateLibraryCount();
+    }
+
+    function saveLibraryFiles() {
+      try {
+        localStorage.setItem('vdl_ai_library_files', JSON.stringify(savedLibraryFiles));
+      } catch (e) {
+        // If quota exceeded, retain newest 50 files
+        if (savedLibraryFiles.length > 50) {
+          savedLibraryFiles = savedLibraryFiles.slice(0, 50);
+          localStorage.setItem('vdl_ai_library_files', JSON.stringify(savedLibraryFiles));
+        }
+      }
+      updateLibraryCount();
+    }
+
+    function updateLibraryCount() {
+      const count = savedLibraryFiles.length;
+      if (libraryBadgeCount) libraryBadgeCount.textContent = count;
+      if (headerLibraryDot) {
+        if (count > 0) headerLibraryDot.classList.remove('hidden');
+        else headerLibraryDot.classList.add('hidden');
+      }
+      if (libraryStorageInfo) libraryStorageInfo.textContent = `${count} files saved in device vault`;
+    }
+
+    function addFileToLibrary(name, type, contentData, previewText = '') {
+      const newFile = {
+        id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        name: name,
+        type: type, // 'pdf' | 'doc' | 'ppt' | 'audio'
+        data: contentData, // Base64 data URI, HTML string, or text
+        preview: previewText.slice(0, 140) || name,
+        createdAt: Date.now()
+      };
+
+      savedLibraryFiles.unshift(newFile);
+      saveLibraryFiles();
+      showToast(`Saved to File Library: ${name}`, '📚');
+    }
+
+    let activeFilter = 'all';
+    window.filterLibraryFiles = function(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.lib-tab').forEach(tab => {
+        tab.classList.remove('bg-brand-cyan/20', 'text-brand-cyan', 'border', 'border-brand-cyan/40', 'font-medium');
+        tab.classList.add('text-slate-400');
+      });
+      event.target.classList.add('bg-brand-cyan/20', 'text-brand-cyan', 'border', 'border-brand-cyan/40', 'font-medium');
+      event.target.classList.remove('text-slate-400');
+      renderLibraryUI();
+    };
+
+    function renderLibraryUI() {
+      libraryFilesList.innerHTML = '';
+      const list = activeFilter === 'all' 
+        ? savedLibraryFiles 
+        : savedLibraryFiles.filter(f => f.type === activeFilter);
+
+      if (list.length === 0) {
+        libraryFilesList.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-48 text-center text-slate-500">
+            <span class="text-3xl mb-2">📂</span>
+            <p class="text-xs">No files saved under this category yet.</p>
+            <p class="text-[10px] text-slate-600 mt-1">Generated PDFs, Word Docs, Slides & Audio automatically appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-brand-surfaceHover border border-brand-border flex items-start justify-between gap-3 shadow hover:border-brand-cyan/40 transition-all';
+
+        let badge = '<span class="text-base">📄</span>';
+        let badgeColor = 'bg-red-950/60 text-red-400 border-red-800/40';
+        if (file.type === 'doc') {
+          badge = '<span class="text-base">📝</span>';
+          badgeColor = 'bg-blue-950/60 text-blue-400 border-blue-800/40';
+        } else if (file.type === 'ppt') {
+          badge = '<span class="text-base">📊</span>';
+          badgeColor = 'bg-amber-950/60 text-amber-400 border-amber-800/40';
+        } else if (file.type === 'audio') {
+          badge = '<span class="text-base">🔊</span>';
+          badgeColor = 'bg-purple-950/60 text-purple-400 border-purple-800/40';
+        }
+
+        const dateStr = new Date(file.createdAt).toLocaleDateString(undefined, {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        item.innerHTML = `
+          <div class="flex items-start gap-3 flex-1 overflow-hidden">
+            <div class="w-9 h-9 rounded-xl ${badgeColor} border flex items-center justify-center flex-none mt-0.5">
+              ${badge}
+            </div>
+            <div class="flex-1 overflow-hidden">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-100 truncate">${escapeHtml(file.name)}</span>
+                <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded border ${badgeColor}">${file.type}</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate mt-0.5">${escapeHtml(file.preview)}</p>
+              <span class="text-[10px] text-slate-500 font-mono mt-1 block">${dateStr}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 flex-none">
+            <button onclick="downloadLibraryItem('${file.id}')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700" title="Download to Device">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            </button>
+            <button onclick="deleteLibraryItem('${file.id}')" class="p-2 rounded-lg hover:bg-red-950/60 text-slate-500 hover:text-red-400" title="Delete">
+              ✕
+            </button>
+          </div>
+        `;
+        libraryFilesList.appendChild(item);
+      });
+    }
+
+    window.downloadLibraryItem = function(id) {
+      const file = savedLibraryFiles.find(f => f.id === id);
+      if (!file) return;
+
+      if (file.type === 'audio') {
+        openAiTool('audio', file.data);
+        speakTextDirect(file.data);
+        libraryModal.classList.add('hidden');
+        return;
+      }
+
+      let mime = 'application/octet-stream';
+      if (file.type === 'pdf') mime = 'application/pdf';
+      else if (file.type === 'doc') mime = 'application/msword';
+      else if (file.type === 'ppt') mime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+
+      triggerRealDeviceDownload(file.data, file.name, mime);
+    };
+
+    window.downloadAllLibraryFiles = async function() {
+      if (!savedLibraryFiles || savedLibraryFiles.length === 0) {
+        showToast('Library is empty!', '⚠️');
+        return;
+      }
+      showToast(`Downloading ${savedLibraryFiles.length} files...`, '📦');
+      for (let i = 0; i < savedLibraryFiles.length; i++) {
+        const file = savedLibraryFiles[i];
+        if (file.type !== 'audio') {
+          await new Promise(r => setTimeout(r, 600));
+          window.downloadLibraryItem(file.id);
+        }
+      }
+    };
+
+    window.deleteLibraryItem = function(id) {
+      savedLibraryFiles = savedLibraryFiles.filter(f => f.id !== id);
+      saveLibraryFiles();
+      renderLibraryUI();
+      showToast('File removed from library', '🗑️');
+    };
+
+    clearLibraryBtn.addEventListener('click', () => {
+      if (confirm && savedLibraryFiles.length > 0) {
+        savedLibraryFiles = [];
+        saveLibraryFiles();
+        renderLibraryUI();
+        showToast('Library cleared', '🗑️');
+      }
+    });
+
+    function openLibrary() {
+      closeSidebar();
+      renderLibraryUI();
+      libraryModal.classList.remove('hidden');
+    }
+
+    headerLibraryBtn.addEventListener('click', openLibrary);
+    drawerLibraryBtn.addEventListener('click', openLibrary);
+    closeLibraryModal.addEventListener('click', () => libraryModal.classList.add('hidden'));
+
+    // --- Export Single AI Response as PDF (With Library Auto-Save) ---
+    window.exportSingleMessagePdf = async function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      showToast('Preparing PDF for this answer...', '⏳');
+
+      const fileName = `VDL_AI_Answer_${Date.now()}.pdf`;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; color: #0f172a; background: #ffffff;">
+          <div style="border-bottom: 2px solid #0072FF; padding-bottom: 12px; margin-bottom: 16px;">
+            <h2 style="color: #0072FF; margin: 0; font-size: 18px; font-weight: 800;">VISHAL DIGITAL LAB AI</h2>
+            <p style="font-size: 11px; color: #64748b; margin: 4px 0 0;">Response Report • ${new Date().toLocaleString()}</p>
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: #1e293b;">
+            ${el.innerHTML}
+          </div>
+          <div style="margin-top: 24px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center;">
+            Generated via Vishal Digital Lab AI
+          </div>
+        </div>
+      `;
+
+      try {
+        if (typeof html2pdf === 'function') {
+          const opt = {
+            margin: [10, 10, 10, 10],
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          const pdfWorker = html2pdf().from(wrapper).set(opt);
+          const pdfBlob = await pdfWorker.output('blob');
+          const pdfDataUri = await pdfWorker.output('datauristring');
+
+          // Trigger guaranteed device download
+          await triggerRealDeviceDownload(pdfBlob, fileName, 'application/pdf');
+
+          // Save to Vault Library
+          addFileToLibrary(fileName, 'pdf', pdfDataUri, el.innerText || 'AI Response PDF');
+        } else {
+          showToast('PDF generator loading...', '⚠️');
+        }
+      } catch (err) {
+        showToast('Download blocked. Tap top PDF button for print fallback', '⚠️');
+      }
+    };
+
+    // --- Export Single AI Response as Word Document (.doc) (With Library Auto-Save) ---
+    window.exportSingleMessageDoc = function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      showToast('Generating Word Document...', '⏳');
+
+      const fileName = `VDL_AI_Answer_${Date.now()}.doc`;
+      const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Vishal Digital Lab AI Answer</title>
+        <style>
+          body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #111827; }
+          h1 { color: #0072FF; font-size: 16pt; margin-bottom: 2pt; }
+          .meta { color: #6B7280; font-size: 9pt; margin-bottom: 16pt; }
+          pre, code { font-family: Consolas, monospace; background: #F3F4F6; padding: 4pt; }
+        </style>
+        </head><body>
+        <h1>VISHAL DIGITAL LAB AI</h1>
+        <div class="meta">Exported on: ${new Date().toLocaleString()} | Powered by Vishal Digital Lab</div>
+        <hr style="border: 0; border-top: 1px solid #D1D5DB; margin-bottom: 14pt;"/>
+      `;
+      const footer = `</body></html>`;
+      const htmlContent = header + el.innerHTML + footer;
+
+      const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+      triggerRealDeviceDownload(blob, fileName, 'application/msword');
+
+      // Save to Vault Library
+      addFileToLibrary(fileName, 'doc', htmlContent, el.innerText || 'Word Document Answer');
+    };
+
+    // --- 1. Text to PDF direct generation (With Library Auto-Save) ---
+    function generateDirectTextToPdf(textContent) {
+      showToast('Creating PDF document...', '⏳');
+      const filename = `VDL_Document_${Date.now()}.pdf`;
+
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; color: #0f172a; background: #ffffff; max-width: 800px;">
+          <div style="border-bottom: 3px solid #0072FF; padding-bottom: 12px; margin-bottom: 20px;">
+            <div style="font-size: 20px; font-weight: 800; color: #0072FF; letter-spacing: 0.5px;">VISHAL DIGITAL LAB AI</div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 3px;">Document Export • ${new Date().toLocaleDateString()}</div>
+          </div>
+          <div style="font-size: 13px; line-height: 1.7; color: #1e293b; white-space: pre-wrap;">${escapeHtml(textContent)}</div>
+          <div style="margin-top: 40px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center;">
+            Generated via Vishal Digital Lab AI • All Rights Reserved
+          </div>
+        </div>
+      `;
+
+      if (typeof html2pdf === 'function') {
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        const pdfWorker = html2pdf().from(wrapper).set(opt);
+        Promise.all([pdfWorker.output('blob'), pdfWorker.output('datauristring')]).then(([blob, dataUri]) => {
+          triggerRealDeviceDownload(blob, filename, 'application/pdf');
+          addFileToLibrary(filename, 'pdf', dataUri, textContent.slice(0, 80));
+          aiToolModal.classList.add('hidden');
+        }).catch(() => {
+          showToast('Failed to save PDF. Try phone print option', '⚠️');
+        });
+      }
+    }
+
+    // --- 2. Text to Presentation (PPTX Generator with Library Auto-Save) ---
+    async function generatePresentationSlides(topicOrText) {
+      if (typeof PptxGenJS === 'undefined') {
+        showToast('Presentation library loading, try again in a moment', '⚠️');
+        return;
+      }
+
+      showToast('Generating slides presentation...', '⏳');
+      try {
+        const pptx = new PptxGenJS();
+        pptx.layout = 'LAYOUT_16x9';
+
+        const paragraphs = topicOrText.split(/\n\n+/).filter(p => p.trim().length > 0);
+        const titleText = (paragraphs[0] || 'Vishal Digital Lab Presentation').replace(/[#*]/g, '').slice(0, 60);
+
+        // Slide 1: Branded Title Slide
+        const titleSlide = pptx.addSlide();
+        titleSlide.background = { color: '090D16' };
+
+        titleSlide.addText('VISHAL DIGITAL LAB AI', {
+          x: 0.8, y: 1.8, w: '85%', h: 0.5,
+          fontSize: 16, color: '00C9FF', bold: true, letterSpacing: 2
+        });
+
+        titleSlide.addText(titleText, {
+          x: 0.8, y: 2.5, w: '85%', h: 1.8,
+          fontSize: 32, color: 'FFFFFF', bold: true, breakLine: true
+        });
+
+        titleSlide.addText('AI Generated Presentation • Ready to Present', {
+          x: 0.8, y: 4.6, w: '85%', h: 0.5,
+          fontSize: 13, color: '94A3B8'
+        });
+
+        // Content Slides
+        const contentSections = paragraphs.slice(1);
+        if (contentSections.length === 0) {
+          const lines = topicOrText.split('\n').filter(l => l.trim().length > 0);
+          for (let i = 0; i < lines.length; i += 4) {
+            const chunk = lines.slice(i, i + 4);
+            const slide = pptx.addSlide();
+            slide.background = { color: '0F172A' };
+
+            slide.addText(`Key Insights (Part ${Math.floor(i / 4) + 1})`, {
+              x: 0.8, y: 0.6, w: '85%', h: 0.6,
+              fontSize: 22, color: '38BDF8', bold: true
+            });
+
+            slide.addText(chunk.map(c => ({ text: c.replace(/^[-*•]\s*/, ''), options: { bullet: true } })), {
+              x: 0.8, y: 1.6, w: '85%', h: 4.0,
+              fontSize: 15, color: 'E2E8F0', lineSpacing: 30
+            });
+          }
+        } else {
+          contentSections.slice(0, 8).forEach((section, index) => {
+            const slide = pptx.addSlide();
+            slide.background = { color: '0F172A' };
+
+            const sectionLines = section.split('\n').filter(l => l.trim().length > 0);
+            const slideHeader = (sectionLines[0] || `Section ${index + 1}`).replace(/[#*]/g, '').slice(0, 45);
+            const bodyLines = sectionLines.slice(1).length > 0 ? sectionLines.slice(1) : sectionLines;
+
+            slide.addText(slideHeader, {
+              x: 0.8, y: 0.6, w: '85%', h: 0.6,
+              fontSize: 22, color: '38BDF8', bold: true
+            });
+
+            slide.addText(bodyLines.map(b => ({ text: b.replace(/^[-*•]\s*/, ''), options: { bullet: true } })), {
+              x: 0.8, y: 1.6, w: '85%', h: 4.0,
+              fontSize: 14, color: 'E2E8F0', lineSpacing: 26
+            });
+          });
+        }
+
+        const fileName = `VDL_Presentation_${Date.now()}.pptx`;
+        const blobPptx = await pptx.write({ outputType: 'blob' });
+        const base64Pptx = await pptx.write({ outputType: 'datauristring' });
+
+        // Trigger guaranteed device download
+        await triggerRealDeviceDownload(blobPptx, fileName, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+
+        // Save to Vault Library
+        addFileToLibrary(fileName, 'ppt', base64Pptx, titleText);
+        aiToolModal.classList.add('hidden');
+      } catch (err) {
+        showToast('Error creating presentation slides', '❌');
+      }
+    }
+
+    // --- 3. Text to Audio (With Library Auto-Save) ---
+    function speakTextDirect(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast('Audio speech is not supported in this browser', '❌');
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const plainText = text
+        .replace(/[*#`_~]/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/```[\s\S]*?```/g, 'Code block omitted.');
+
+      currentSpeechSynthesisUtterance = new SpeechSynthesisUtterance(plainText);
+      currentSpeechSynthesisUtterance.rate = 1.0;
+      currentSpeechSynthesisUtterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferred) currentSpeechSynthesisUtterance.voice = preferred;
+
+      currentSpeechSynthesisUtterance.onstart = () => updateAudioState('playing');
+      currentSpeechSynthesisUtterance.onpause = () => updateAudioState('paused');
+      currentSpeechSynthesisUtterance.onresume = () => updateAudioState('playing');
+      currentSpeechSynthesisUtterance.onend = () => updateAudioState('stopped');
+      currentSpeechSynthesisUtterance.onerror = () => updateAudioState('stopped');
+
+      window.speechSynthesis.speak(currentSpeechSynthesisUtterance);
+      showToast('Playing audio speech...', '🔊');
+
+      // Auto-save audio script to library
+      const audioTitle = `Audio_Voice_${Date.now()}`;
+      if (!savedLibraryFiles.some(f => f.preview === plainText.slice(0, 140))) {
+        addFileToLibrary(audioTitle, 'audio', plainText, plainText.slice(0, 100));
+      }
+    }
+
+    // --- 2. Text to Presentation (PPTX Generator) ---
+    async function generatePresentationSlides(topicOrText) {
+      if (typeof PptxGenJS === 'undefined') {
+        showToast('Presentation library loading, try again in a moment', '⚠️');
+        return;
+      }
+
+      showToast('Generating slides presentation...', '⏳');
+      try {
+        const pptx = new PptxGenJS();
+        pptx.layout = 'LAYOUT_16x9';
+
+        // Split text into paragraphs or bullet sections
+        const paragraphs = topicOrText.split(/\n\n+/).filter(p => p.trim().length > 0);
+        const titleText = (paragraphs[0] || 'Vishal Digital Lab Presentation').replace(/[#*]/g, '').slice(0, 60);
+
+        // Slide 1: Branded Title Slide
+        const titleSlide = pptx.addSlide();
+        titleSlide.background = { color: '090D16' };
+
+        titleSlide.addText('VISHAL DIGITAL LAB AI', {
+          x: 0.8, y: 1.8, w: '85%', h: 0.5,
+          fontSize: 16, color: '00C9FF', bold: true, letterSpacing: 2
+        });
+
+        titleSlide.addText(titleText, {
+          x: 0.8, y: 2.5, w: '85%', h: 1.8,
+          fontSize: 32, color: 'FFFFFF', bold: true, breakLine: true
+        });
+
+        titleSlide.addText('AI Generated Presentation • Ready to Present', {
+          x: 0.8, y: 4.6, w: '85%', h: 0.5,
+          fontSize: 13, color: '94A3B8'
+        });
+
+        // Content Slides
+        const contentSections = paragraphs.slice(1);
+        if (contentSections.length === 0) {
+          // Break the main text into chunks if it was single block
+          const lines = topicOrText.split('\n').filter(l => l.trim().length > 0);
+          for (let i = 0; i < lines.length; i += 4) {
+            const chunk = lines.slice(i, i + 4);
+            const slide = pptx.addSlide();
+            slide.background = { color: '0F172A' };
+
+            slide.addText(`Key Insights (Part ${Math.floor(i / 4) + 1})`, {
+              x: 0.8, y: 0.6, w: '85%', h: 0.6,
+              fontSize: 22, color: '38BDF8', bold: true
+            });
+
+            slide.addText(chunk.map(c => ({ text: c.replace(/^[-*•]\s*/, ''), options: { bullet: true } })), {
+              x: 0.8, y: 1.6, w: '85%', h: 4.0,
+              fontSize: 15, color: 'E2E8F0', lineSpacing: 30
+            });
+          }
+        } else {
+          contentSections.slice(0, 8).forEach((section, index) => {
+            const slide = pptx.addSlide();
+            slide.background = { color: '0F172A' };
+
+            const sectionLines = section.split('\n').filter(l => l.trim().length > 0);
+            const slideHeader = (sectionLines[0] || `Section ${index + 1}`).replace(/[#*]/g, '').slice(0, 45);
+            const bodyLines = sectionLines.slice(1).length > 0 ? sectionLines.slice(1) : sectionLines;
+
+            slide.addText(slideHeader, {
+              x: 0.8, y: 0.6, w: '85%', h: 0.6,
+              fontSize: 22, color: '38BDF8', bold: true
+            });
+
+            slide.addText(bodyLines.map(b => ({ text: b.replace(/^[-*•]\s*/, ''), options: { bullet: true } })), {
+              x: 0.8, y: 1.6, w: '85%', h: 4.0,
+              fontSize: 14, color: 'E2E8F0', lineSpacing: 26
+            });
+          });
+        }
+
+        const fileName = `VDL_Presentation_${Date.now()}.pptx`;
+        await pptx.writeFile({ fileName: fileName });
+        showToast('Presentation (.pptx) downloaded!', '📊');
+        aiToolModal.classList.add('hidden');
+      } catch (err) {
+        showToast('Error creating presentation slides', '❌');
+      }
+    }
+
+    // --- 3. Text to Audio (Speech Synthesis) ---
+    function speakTextDirect(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast('Audio speech is not supported in this browser', '❌');
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      // Clean markdown tags for natural speech
+      const plainText = text
+        .replace(/[*#`_~]/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/```[\s\S]*?```/g, 'Code block omitted.');
+
+      currentSpeechSynthesisUtterance = new SpeechSynthesisUtterance(plainText);
+      currentSpeechSynthesisUtterance.rate = 1.0;
+      currentSpeechSynthesisUtterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferred) currentSpeechSynthesisUtterance.voice = preferred;
+
+      currentSpeechSynthesisUtterance.onstart = () => updateAudioState('playing');
+      currentSpeechSynthesisUtterance.onpause = () => updateAudioState('paused');
+      currentSpeechSynthesisUtterance.onresume = () => updateAudioState('playing');
+      currentSpeechSynthesisUtterance.onend = () => updateAudioState('stopped');
+      currentSpeechSynthesisUtterance.onerror = () => updateAudioState('stopped');
+
+      window.speechSynthesis.speak(currentSpeechSynthesisUtterance);
+      showToast('Playing audio speech...', '🔊');
+    }
+
+    function updateAudioState(state) {
+      if (state === 'playing') {
+        audioStatusText.textContent = 'Speaking audio...';
+        audioPlayingDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-ping';
+      } else if (state === 'paused') {
+        audioStatusText.textContent = 'Audio paused';
+        audioPlayingDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+      } else {
+        audioStatusText.textContent = 'Speech finished';
+        audioPlayingDot.className = 'w-2 h-2 rounded-full bg-slate-500';
+      }
+    }
+
+    playAudioBtn.addEventListener('click', () => {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+        updateAudioState('playing');
+      } else {
+        speakTextDirect(aiToolTextarea.value.trim());
+      }
+    });
+
+    pauseAudioBtn.addEventListener('click', () => {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause();
+        updateAudioState('paused');
+      }
+    });
+
+    stopAudioBtn.addEventListener('click', () => {
+      window.speechSynthesis.cancel();
+      updateAudioState('stopped');
+    });
+
+    // Helper functions callable from AI bubble action buttons
+    window.speakMessageBubble = function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      const cleanText = el.innerText || el.textContent;
+      openAiTool('audio', cleanText);
+      speakTextDirect(cleanText);
+    };
+
+    window.exportMessageToPpt = function(bubbleId) {
+      const el = document.getElementById(bubbleId);
+      if (!el) return;
+      const cleanText = el.innerText || el.textContent;
+      openAiTool('ppt', cleanText);
+    };
+
+    // --- Auto Prompt Enhancer / Rewrite Perfectly ---
+    enhancePromptBtn.addEventListener('click', async () => {
+      const userPrompt = chatInput.value.trim();
+      if (!userPrompt) {
+        showToast('Please type a prompt first to enhance it!', '✍️');
+        return;
+      }
+
+      enhancePromptBtn.classList.add('animate-spin', 'text-amber-400');
+      showToast('Perfecting your prompt with AI...', '✨');
+
+      try {
+        const apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
+        const rewriteInstruction = "You are an expert prompt engineer. Take the user's rough or brief input and rewrite it into a highly effective, clear, detailed, and perfectly structured prompt for an AI assistant. Return ONLY the rewritten prompt directly without introductory pleasantries, quotes, or markdown backticks.";
+        
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Rewrite this prompt to make it complete, high-quality, and prompt-engineered:\n\n${userPrompt}` }] }],
+            systemInstruction: { parts: [{ text: rewriteInstruction }] }
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const enhanced = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (enhanced) {
+            chatInput.value = enhanced;
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 128) + 'px';
+            showToast('Prompt perfected! Tap send.', '🌟');
+          }
+        } else {
+          // Fallback heuristic rewrite if offline/busy
+          chatInput.value = `Please provide a comprehensive, step-by-step, and deeply structured analysis of the following topic: ${userPrompt}. Include examples, key takeaways, and practical best practices.`;
+          showToast('Prompt enhanced!', '🌟');
+        }
+      } catch (e) {
+        chatInput.value = `Please provide a comprehensive, step-by-step, and deeply structured analysis of the following topic: ${userPrompt}. Include examples, key takeaways, and practical best practices.`;
+        showToast('Prompt enhanced!', '🌟');
+      } finally {
+        enhancePromptBtn.classList.remove('animate-spin', 'text-amber-400');
+        chatInput.focus();
+      }
+    });
+
+    function scrollToBottom() {
+      chatViewport.scrollTo({
+        top: chatViewport.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    // --- Auto-expanding Chat Textarea ---
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    });
+
+    sendActionBtn.addEventListener('click', () => {
+      if (isGenerating) {
+        if (abortController) abortController.abort();
+      } else {
+        handleSendMessage();
+      }
+    });
+
+    function toggleSendButtonState(generating) {
+      isGenerating = generating;
+      if (generating) {
+        sendIcon.classList.add('hidden');
+        stopIcon.classList.remove('hidden');
+        sendActionBtn.classList.add('bg-red-600', 'from-red-600', 'to-red-700');
+      } else {
+        sendIcon.classList.remove('hidden');
+        stopIcon.classList.add('hidden');
+        sendActionBtn.classList.remove('bg-red-600', 'from-red-600', 'to-red-700');
+      }
+    }
+
+    // --- Sending Messages to Gemini API ---
+    async function handleSendMessage() {
+      const apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
+
+      const rawText = chatInput.value.trim();
+      const attachedImage = currentAttachedBase64;
+      const attachedFileContent = currentAttachedFileText;
+      const attachedName = currentAttachedFileName;
+
+      if (!rawText && !attachedImage && !attachedFileContent) return;
+
+      const session = getActiveSession();
+
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      clearAttachmentPreview();
+
+      if (session.messages.length === 0) {
+        session.title = (rawText || attachedName || 'File Analysis').slice(0, 26);
+      }
+
+      const userMessage = {
+        role: 'user',
+        content: rawText,
+        image: attachedImage,
+        fileName: attachedName,
+        fileContent: attachedFileContent,
+        timestamp: Date.now()
+      };
+      session.messages.push(userMessage);
+      saveSessionsToStorage();
+
+      appendMessageBubble('user', rawText, attachedImage, false, null, attachedName);
+
+      isGenerating = true;
+      toggleSendButtonState(true);
+      abortController = new AbortController();
+
+      const aiBubbleWrapper = appendMessageBubble('model', '', null, true);
+      const streamingTarget = document.getElementById('streamingBubble');
+
+      let accumulatedReply = '';
+
+      try {
+        const contentsPayload = [];
+        const recentHistory = session.messages.slice(-8);
+
+        recentHistory.forEach((m) => {
+          const parts = [];
+          if (m.image) {
+            const match = m.image.match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
+            if (match) {
+              parts.push({
+                inlineData: {
+                  mimeType: match[1],
+                  data: match[2]
+                }
+              });
+            }
+          }
+          
+          let textCombined = m.content || '';
+          if (m.fileContent) {
+            textCombined = `[ATTACHED FILE: "${m.fileName || 'File'}"]\n--- FILE CONTENTS ---\n${m.fileContent}\n--- END FILE CONTENTS ---\n\nUser Question/Instruction:\n${textCombined || 'Please review, analyze, or summarize this file.'}`;
+          }
+
+          if (textCombined) {
+            parts.push({ text: textCombined });
+          }
+
+          contentsPayload.push({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: parts
+          });
+        });
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:streamGenerateContent?key=${apiKey}&alt=sse`;
+
+        let response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: abortController.signal,
+
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: abortController.signal,
+          body: JSON.stringify({
+            contents: contentsPayload,
+            systemInstruction: {
+              parts: [{ text: SYSTEM_INSTRUCTION }]
+            },
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2048
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          // If streaming fails or throttles, fallback immediately to standard generateContent
+          const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+          const fallbackRes = await fetch(fallbackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: contentsPayload,
+              systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }
+            })
+          });
+
+          if (!fallbackRes.ok) {
+            throw new Error(errData.error?.message || `HTTP ${response.status}`);
+          }
+          const fbData = await fallbackRes.json();
+          accumulatedReply = fbData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          streamingTarget.innerHTML = renderMarkdown(accumulatedReply);
+        } else {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const chunkText = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                  accumulatedReply += chunkText;
+                  streamingTarget.innerHTML = renderMarkdown(accumulatedReply);
+                  scrollToBottom();
+                } catch (parseErr) {
+                  // partial chunk continue
+                }
+              }
+            }
+          }
+        }
+
+        streamingTarget.classList.remove('typing-cursor');
+
+        const aiMessage = {
+          role: 'model',
+          content: accumulatedReply || 'No response generated.',
+          timestamp: Date.now()
+        };
+        session.messages.push(aiMessage);
+        saveSessionsToStorage();
+        renderActiveConversation();
+
+      } catch (err) {
+        streamingTarget.classList.remove('typing-cursor');
+        if (err.name === 'AbortError') {
+          streamingTarget.innerHTML = renderMarkdown(accumulatedReply + '\n\n*(Generation stopped by user)*');
+          session.messages.push({ role: 'model', content: accumulatedReply, timestamp: Date.now() });
+          saveSessionsToStorage();
+        } else {
+          streamingTarget.innerHTML = `
+            <div class="text-red-400">
+              <p class="font-semibold text-xs">⚠️ Connection Error</p>
+              <p class="text-[11px] mt-1">${escapeHtml(err.message)}</p>
+              <button onclick="retryLastMessage()" class="mt-2 text-xs bg-red-950/60 hover:bg-red-900 border border-red-700/50 text-red-200 px-2.5 py-1 rounded-lg">
+                🔄 Retry
+              </button>
+            </div>
+          `;
+        }
+      } finally {
+        toggleSendButtonState(false);
+        abortController = null;
+      }
+    }
+
+    window.retryLastMessage = function() {
+      const session = getActiveSession();
+      if (!session.messages || session.messages.length === 0) return;
+      const lastMsg = session.messages[session.messages.length - 1];
+      if (lastMsg.role === 'user') {
+        chatInput.value = lastMsg.content || '';
+        session.messages.pop();
+        handleSendMessage();
+      }
+    };
+
+    // --- Universal File Upload Handling ---
+    fileUpload.addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      currentAttachedFileName = file.name;
+      attachedFileName.textContent = file.name;
+
+      imagePreview.classList.add('hidden');
+      pdfIconPreview.classList.add('hidden');
+      fileIconPreview.classList.add('hidden');
+
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+
+      if (file.type === 'application/pdf' || fileExtension === 'pdf') {
+        showToast('Reading PDF document...', '⏳');
+        pdfIconPreview.classList.remove('hidden');
+        attachedFileSize.textContent = (file.size / 1024).toFixed(1) + ' KB • PDF';
+        filePreviewContainer.classList.remove('hidden');
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+          const pdf = await loadingTask.promise;
+          let fullText = '';
+          const maxPages = Math.min(pdf.numPages, 20);
+
+          for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += `--- Page ${pageNum} ---\n` + pageText + '\n\n';
+          }
+
+          currentAttachedFileText = fullText.trim();
+          currentAttachedBase64 = null;
+          showToast(`PDF ready! (${pdf.numPages} pages)`, '📄');
+          chatInput.focus();
+        } catch (err) {
+          showToast('Could not parse PDF content', '❌');
+          clearAttachmentPreview();
+        }
+
+      } else if (file.type.startsWith('image/')) {
+        imagePreview.classList.remove('hidden');
+        attachedFileSize.textContent = (file.size / 1024).toFixed(1) + ' KB • Image';
+        filePreviewContainer.classList.remove('hidden');
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentAttachedBase64 = evt.target.result;
+          imagePreview.src = currentAttachedBase64;
+          currentAttachedFileText = null;
+          chatInput.focus();
+        };
+        reader.readAsDataURL(file);
+
+      } else {
+        showToast('Reading file contents...', '⏳');
+        fileIconPreview.classList.remove('hidden');
+        attachedFileSize.textContent = (file.size / 1024).toFixed(1) + ' KB • Document/Code';
+        filePreviewContainer.classList.remove('hidden');
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentAttachedFileText = evt.target.result;
+          currentAttachedBase64 = null;
+          showToast('File attached & ready!', '📁');
+          chatInput.focus();
+        };
+        reader.onerror = function() {
+          showToast('Failed to read file', '❌');
+          clearAttachmentPreview();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    removeFileBtn.addEventListener('click', clearAttachmentPreview);
+
+    function clearAttachmentPreview() {
+      currentAttachedBase64 = null;
+      currentAttachedFileText = null;
+      currentAttachedFileName = null;
+      imagePreview.src = '';
+      imagePreview.classList.add('hidden');
+      pdfIconPreview.classList.add('hidden');
+      fileIconPreview.classList.add('hidden');
+      filePreviewContainer.classList.add('hidden');
+      fileUpload.value = '';
+    }
+
+    // ==============================================================
+    // 9. ROBUST & GUARANTEED PDF EXPORT SYSTEM
+    // ==============================================================
+    async function exportConversationToPDF() {
+      const session = getActiveSession();
+      if (!session.messages || session.messages.length === 0) {
+        showToast('No messages to export!', '⚠️');
+        return;
+      }
+
+      showToast('Preparing PDF file...', '⏳');
+      closeSidebar();
+
+      const filename = `${(session.title || 'chat').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_vdl.pdf`;
+      
+      let chatItemsHtml = '';
+      session.messages.forEach(m => {
+        const isUser = m.role === 'user';
+        chatItemsHtml += `
+          <div style="margin-bottom: 14px; padding: 12px 16px; border-radius: 8px; background: ${isUser ? '#f0fdf4' : '#f8fafc'}; border: 1px solid ${isUser ? '#bbf7d0' : '#e2e8f0'};">
+            <div style="font-size: 11px; font-weight: 700; color: ${isUser ? '#16a34a' : '#2563eb'}; margin-bottom: 5px; text-transform: uppercase;">
+              ${isUser ? '👤 You' : '🤖 Vishal Digital Lab AI'}
+            </div>
+            ${m.fileName ? `<div style="font-size: 10px; color: #0284c7; margin-bottom: 6px; font-family: monospace;">📁 Attached: ${escapeHtml(m.fileName)}</div>` : ''}
+            <div style="font-size: 13px; line-height: 1.6; color: #1e293b; white-space: pre-wrap; word-break: break-word;">${escapeHtml(m.content || '')}</div>
+          </div>
+        `;
+      });
+
+      currentGeneratedHtmlDoc = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${escapeHtml(session.title || 'VDL AI Chat Transcript')}</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              padding: 24px;
+              color: #0f172a;
+              background: #ffffff;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            .header {
+              border-bottom: 2px solid #0072FF;
+              padding-bottom: 14px;
+              margin-bottom: 20px;
+            }
+            .title {
+              font-size: 20px;
+              font-weight: 800;
+              color: #0072FF;
+              margin: 0;
+            }
+            .subtitle {
+              font-size: 14px;
+              font-weight: 600;
+              color: #334155;
+              margin: 4px 0 0;
+            }
+            .meta {
+              font-size: 11px;
+              color: #64748b;
+              margin: 4px 0 0;
+            }
+            .footer {
+              margin-top: 30px;
+              padding-top: 12px;
+              border-top: 1px solid #e2e8f0;
+              font-size: 10px;
+              color: #94a3b8;
+              text-align: center;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">VISHAL DIGITAL LAB AI</h1>
+            <h2 class="subtitle">${escapeHtml(session.title || 'Conversation Transcript')}</h2>
+            <p class="meta">Exported on: ${new Date().toLocaleString()} • Powered by Vishal Digital Lab</p>
+          </div>
+          <div>${chatItemsHtml}</div>
+          <div class="footer">Generated via Vishal Digital Lab AI Workspace</div>
+        </body>
+        </html>
+      `;
+
+      const tempWrapper = document.createElement('div');
+      tempWrapper.innerHTML = currentGeneratedHtmlDoc;
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        if (typeof html2pdf === 'function') {
+          const pdfWorker = html2pdf().from(tempWrapper).set(opt);
+          const pdfBlob = await pdfWorker.output('blob');
+          const pdfDataUri = await pdfWorker.output('datauristring');
+
+          if (currentGeneratedPdfBlobUrl) {
+            URL.revokeObjectURL(currentGeneratedPdfBlobUrl);
+          }
+          currentGeneratedPdfBlobUrl = URL.createObjectURL(pdfBlob);
+
+          // Configure direct download button with mobile fallback
+          directPdfDownloadLink.onclick = (e) => {
+            e.preventDefault();
+            triggerRealDeviceDownload(pdfBlob, filename, 'application/pdf');
+          };
+
+          // Save transcript to Library Vault
+          addFileToLibrary(filename, 'pdf', pdfDataUri, session.title || 'Chat Transcript');
+
+          // Show the Export Modal
+          pdfDownloadModal.classList.remove('hidden');
+          showToast('PDF ready & saved to Library!', '✅');
+
+        } else {
+          throw new Error('PDF generator library not loaded');
+        }
+      } catch (err) {
+        console.warn('Direct PDF generator notice, opening viewer fallback:', err);
+        openDocumentInNewTab();
+      }
+    }
+
+    // Modal Action: Open Document in New Tab
+    openPdfViewerBtn.addEventListener('click', () => {
+      openDocumentInNewTab();
+    });
+
+    function openDocumentInNewTab() {
+      if (currentGeneratedPdfBlobUrl) {
+        window.open(currentGeneratedPdfBlobUrl, '_blank');
+      } else {
+        const blob = new Blob([currentGeneratedHtmlDoc], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      }
+    }
+
+    // Modal Action: Native System Print / Save as PDF
+    printPdfBtn.addEventListener('click', () => {
+      pdfDownloadModal.classList.add('hidden');
+      
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(currentGeneratedHtmlDoc);
+      frameDoc.close();
+
+      setTimeout(() => {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => printFrame.remove(), 2000);
+      }, 500);
+    });
+
+    closePdfModalBtn.addEventListener('click', () => {
+      pdfDownloadModal.classList.add('hidden');
+    });
+
+    exportPdfBtn.addEventListener('click', exportConversationToPDF);
+    headerExportPdfBtn.addEventListener('click', exportConversationToPDF);
+
+    // --- Voice Dictation ---
+    function setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        voiceInputBtn.style.display = 'none';
+        return;
+      }
+
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.continuous = false;
+      speechRecognition.interimResults = false;
+      speechRecognition.lang = 'en-US';
+
+      speechRecognition.onstart = () => {
+        isListening = true;
+        voiceInputBtn.classList.add('text-red-400', 'animate-pulse');
+        showToast('Listening...', '🎙️');
+      };
+
+      speechRecognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        chatInput.value = (chatInput.value + ' ' + transcript).trim();
+        chatInput.dispatchEvent(new Event('input'));
+      };
+
+      speechRecognition.onerror = () => {
+        showToast('Speech input stopped', '🔇');
+      };
+
+      speechRecognition.onend = () => {
+        isListening = false;
+        voiceInputBtn.classList.remove('text-red-400', 'animate-pulse');
+      };
+
+      voiceInputBtn.addEventListener('click', () => {
+        if (isListening) {
+          speechRecognition.stop();
+        } else {
+          speechRecognition.start();
+        }
+      });
+    }
+
+    // --- Setup Prompt Chips ---
+    function setupPromptChips() {
+      document.querySelectorAll('.prompt-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          chatInput.value = btn.innerText.replace(/^[^\s]+\s/, '');
+          chatInput.focus();
+          chatInput.dispatchEvent(new Event('input'));
+        });
+      });
+    }
+
+    // --- Toast Notification Helper ---
+    function showToast(message, icon = 'ℹ️') {
+      const existing = document.getElementById('toastNotification');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'toastNotification';
+      toast.className = 'fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-brand-surface/95 border border-brand-border text-slate-100 text-xs px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 transition-all transform duration-300';
+      toast.innerHTML = `<span>${icon}</span><span>${escapeHtml(message)}</span>`;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

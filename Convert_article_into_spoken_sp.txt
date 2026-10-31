@@ -1,0 +1,6 @@
+Convert article into spoken sp
+==============================
+
+[31/10/2026, 21:27:02] You:
+Convert article into spoken speechDeployment: Using Docker and Cloud (AWS/GCP) to keep your agents running 24/7.
+•  Visual/Graphic Suggestion: A "Toolbox" graphic. On the left, code-heavy logos (LangChain, Python). On the right, UI-based logos (Flowise, Zapier).
